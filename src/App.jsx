@@ -6,9 +6,35 @@ function App() {
   const [response, setResponse] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [token, setToken] = useState(null);
+
+  const clientIdBase64 = btoa(clientId);
+  const clientSecretBase64 = btoa(clientSecret);
+  const base64Auth = clientIdBase64 + ':' + clientSecretBase64;
 
   useEffect(() => {
-    authorize();
+    const getAccessToken = async () => {
+      try {
+        const data = await fetch(`${oauth2BaseUrl}/token`, {
+          body: `grant_type=client_credentials&scope=${scope}`,
+          headers: {
+            Authorization: `Basic ${base64Auth}` ,
+            "Content-Type": "application/x-www-form-urlencoded"
+          },
+          method: "POST"
+        });
+        console.log(`data: ${data}`);
+        const token = data.json();
+        setToken(token);
+        console.log(`token: ${JSON.stringify(token)}`);
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+        setError(error);
+      }
+    };
+    getAccessToken();
+    // authorize();
   }, [])
 
   async function authorize() {
@@ -39,7 +65,7 @@ function App() {
 
   return (
     <>
-      <h1>Vite + React</h1>
+      <h1>Price Of Eggs</h1>
       <div className="card">
         {/* <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
