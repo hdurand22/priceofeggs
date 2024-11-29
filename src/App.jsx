@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { oauth2BaseUrl, clientId, redirectUrl, scope, clientSecret } from './config'
+import { redirectToLogin } from './authentication';
 import './App.css'
 
 function App() {
@@ -13,28 +14,26 @@ function App() {
   const base64Auth = clientIdBase64 + ':' + clientSecretBase64;
 
   useEffect(() => {
-    const getAccessToken = async () => {
-      try {
-        const data = await fetch(`${oauth2BaseUrl}/token`, {
-          body: `grant_type=client_credentials&scope=${scope}`,
-          headers: {
-            Authorization: `Basic ${base64Auth}` ,
-            "Content-Type": "application/x-www-form-urlencoded"
-          },
-          method: "POST"
-        });
-        console.log(`data: ${data}`);
-        const token = data.json();
-        setToken(token);
-        console.log(`token: ${JSON.stringify(token)}`);
-        setLoading(false);
-      } catch (error) {
-        console.error(error);
-        setError(error);
-      }
-    };
-    getAccessToken();
-    // authorize();
+    redirectToLogin();
+    // const getAccessToken = async () => {
+    //   try {
+    //     const token = await fetch(`${oauth2BaseUrl}/token`, {
+    //       body: `grant_type=client_credentials&scope=${scope}`,
+    //       headers: {
+    //         Authorization: `Basic ${base64Auth}` ,
+    //         "Content-Type": "application/x-www-form-urlencoded"
+    //       },
+    //       method: "POST"
+    //     });
+    //     setToken(token);
+    //     console.log(`token: ${JSON.stringify(token)}`);
+    //     setLoading(false);
+    //   } catch (error) {
+    //     console.error(error);
+    //     setError(error);
+    //   }
+    // };
+    // getAccessToken();
   }, [])
 
   async function authorize() {
@@ -43,7 +42,8 @@ function App() {
         headers: {
           "Cache-Control": "no-cache",
           "Content-Type": "application/x-www-form-urlencoded"
-        }
+        },
+        mode: "no-cors"
       })
       setResponse(response);
       console.log(response);
